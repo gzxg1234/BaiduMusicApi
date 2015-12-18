@@ -1,0 +1,2 @@
+# BaiduMusicApi
+从百度音乐app中扒下来的api，基本上百度app上的功能接口都有，除了与用户信息有关的
