@@ -1,0 +1,112 @@
+<html>
+	<head><style>
+		body{text-align:center}
+	</style>
+	<title>通联智管家</title>
+	<script language="javascript">
+
+		function post_manager(opt,objform) {
+			debugger;
+			if(opt.name=="btn_login"){
+				objform.transtype.value="900100001";
+				post(objform);	
+			}else if(opt.name=="btn_settle"){
+				objform.transtype.value="900100002";
+				post(objform);	
+			}else if(opt.name=="btn_show"){
+				objform.transtype.value="900100003";
+				post(objform);	
+			}else if(opt.name=="btn_last"){
+				objform.transtype.value="900100010";
+				objform.orig_trace_no.value="000000";
+				post(objform);	
+			}else if(opt.name=="btn_detail"){
+				objform.transtype.value="900100012";
+				post(objform);	
+			}else if(opt.name=="btn_total"){
+				objform.transtype.value="900100013";
+				post(objform);	
+			} 
+		}
+
+		function post(objform) {
+			alert(navigator.userAgent)
+			if (""==objform.ip.value){
+				alert("请先输入POS机的IP地址！");
+				return;
+			}
+			var postData = {
+				"business_id": objform.transtype.value,
+				"amount":objform.amt.value,
+				"memo":"00161706070004",
+				"trans_check":objform.trans_check.value,
+				"qrcode":objform.qrcode.value
+			};
+
+			postData = (function(obj){ // 转成post需要的字符串.
+				var str = "";
+
+				for(var prop in obj){
+					str += prop + "=" + obj[prop] + "&"
+				}
+				return str;
+			})(postData);
+
+			var xhr = new XMLHttpRequest();
+
+			xhr.open("POST", "http://"+objform.ip.value+":9801/trans", true);
+			xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+			xhr.onreadystatechange = function(){
+				var XMLHttpReq = xhr;
+				if (XMLHttpReq.readyState == 4) {
+					if (XMLHttpReq.status == 200) {
+						var text = XMLHttpReq.responseText;
+						objform.response.value=text;
+						console.log(text);
+					}
+				}
+			};
+			xhr.send(postData);
+		}
+	</script>
+</head>
+
+<body>
+	<h1>通联智管家WEB SERVICE 调用示例</h1>
+	<form>
+		交易类型：<select name="transtype">
+			<option value ="900100001">签到</option>
+			<option value ="100100001">银行卡消费</option>
+			<option value ="100300001">扫码支付</option>
+			<option value ="200100001">银行卡撤销</option>
+			<option value ="200300001">扫码撤销</option>
+			<option value ="900100010">重打印末笔</option>
+			<option value ="900100012">打印交易明细</option>
+			<option value ="900100013">打印交易汇总</option>
+			<option value ="900100003">查询交易记录</option>
+			<option value ="900100004">提取交易记录</option>
+			<option value ="900100002">结算</option>
+		</select><br/>
+		POS地址：<input type="text" name="ip" style="border-color:red;border-width:1px" value="10.1.64.236"/><br/>
+		交易金额：<input type="text" name="amt" value="000000000001"/><br/>
+		原凭证号：<input type="text" name="orig_trace_no"/><br/>
+		唯一标识号：<input type="text" name="trans_check"/><br/>
+		扫码信息：<input type="text" name="qrcode"/><br/>
+		<br/>---------->>>
+		<input type="button" name="btn_trans" value="发起交易" onclick="post(this.form)">
+		<<<----------<br/><br/>
+		<input type="button" name="btn_login" value="签到" onclick="post_manager(this,this.form)"  style="width:100px;height:40px">
+		<input type="button" name="btn_settle" value="结算" onclick="post_manager(this,this.form)"  style="width:100px;height:40px">
+		<input type="button" name="btn_show" value="查询交易记录" onclick="post_manager(this,this.form)" style="width:100px;height:40px"><br/><br/>
+		<input type="button" name="btn_last" value="重打印末笔" onclick="post_manager(this,this.form)"  style="width:100px;height:40px">
+		<input type="button" name="btn_detail" value="打印明细" onclick="post_manager(this,this.form)" style="width:100px;height:40px">
+		<input type="button" name="btn_total" value="打印汇总" onclick="post_manager(this,this.form)" style="width:100px;height:40px"><br/>
+
+		应答内容:<br/><textarea name="response" id="response" cols="50" rows="20"></textarea>
+		<br/>
+
+
+	</form>
+
+</body>
+</html>
